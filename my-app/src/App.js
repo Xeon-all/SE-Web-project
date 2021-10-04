@@ -1,24 +1,26 @@
-import logo from './logo.svg';
+import {
+  Button,
+  Modal,
+} from 'antd'
+import { useState } from 'react'
 import './App.css';
 
 function App() {
+  const [ModalVisible, setModalVisible] = useState(false);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Button
+      onClick = {() => {setModalVisible(true)}}
+      style = {{transform: 'translate(50%, 50%)'}}>
+        Hello, world!
+      </Button>
+      <Modal
+      visible = {ModalVisible}
+      footer = {null}
+      onCancel = {() => {setModalVisible(false)}}>
+        <h1>Hello, world!</h1>
+      </Modal>
+    </>
   );
 }
 
