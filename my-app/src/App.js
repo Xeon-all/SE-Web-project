@@ -21,14 +21,19 @@ function App() {
       id: Tasks.length,
       key: 2,
     }
+    
     let task = [...Tasks, newTask];
     setTasks(task);
   }
 
-  function handleDelete(id) {
+  function handleDelete(x) {
     let task = Tasks;
-    console.log(task[id]);
-    task.splice(id, 1);
+    console.log(task[x]);
+    task.splice(x, 1);
+    for(let i = x; i < task.length; i ++)
+    {
+      task[i].id = task[i].id - 1;
+    }
     setTasks(task);
     forceUpdate();
   }
