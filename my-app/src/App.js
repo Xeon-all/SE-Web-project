@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   Layout,
+  Input,
 } from 'antd'
 import {
   PlusCircleOutlined,
@@ -20,6 +21,8 @@ function App() {
     let newTask = {
       id: Tasks.length,
       key: 2,
+      name: `第${Tasks.length}个任务`,
+      selected: false,
     }
     
     let task = [...Tasks, newTask];
@@ -38,6 +41,11 @@ function App() {
     forceUpdate();
   }
 
+  function handleChangeName(e, val){
+    val.name = e.target.value;
+    e.target.blur();
+  }
+
   return (
     <>
     <Layout>
@@ -53,7 +61,13 @@ function App() {
             return (
               <Card style = {{margin: '20px'}}>
                 <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
-                {`第${val.id}个任务`}
+                <Input 
+                  bordered = {val.selected}
+                  onFocus = {() => {val.selected = true;forceUpdate();}} 
+                  onBlur = {(e) => {val.name = e.target.value; val.selected = false;forceUpdate();}}
+                  defaultValue = {val.name} 
+                  onPressEnter = {(e) => {handleChangeName(e, val);}} 
+                  style = {{width: "10vw",}}/>
                 <PlusCircleOutlined style = {{float: 'right'}}/>
               </Card>
             )
