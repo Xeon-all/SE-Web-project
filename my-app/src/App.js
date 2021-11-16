@@ -57,14 +57,18 @@ function App() {
       <Layout>
         <Sider style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible></Sider>
         <Content>
-          {Tasks.map((val) => {
+          {Tasks.map((val, index, arr) => {
             return (
               <Card style = {{margin: '20px'}}>
                 <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
                 <Input 
                   bordered = {val.selected}
                   onFocus = {() => {val.selected = true;forceUpdate();}} 
-                  onBlur = {(e) => {val.name = e.target.value; val.selected = false;forceUpdate();}}
+                  onBlur = {(e) => {
+                    arr[index].name = e.target.value;
+                    setTasks(arr);
+                    val.selected = false;
+                    forceUpdate();}}
                   defaultValue = {val.name} 
                   onPressEnter = {(e) => {handleChangeName(e, val);}} 
                   style = {{width: "10vw",}}/>
