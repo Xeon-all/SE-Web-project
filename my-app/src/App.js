@@ -49,7 +49,10 @@ function App() {
     <>
     <Layout>
       <Header>
-        <Button style = {{marginLeft: '50%'}} onClick = {handleAdd}>
+        <Input prefix = {'user:'} style = {{width: "8vw",}}/>
+        <Input prefix = {'password:'} style = {{width: "10vw",}}/>
+        <Button> log in </Button>
+        <Button style = {{marginLeft: '32%'}} onClick = {handleAdd}>
           add
         </Button>
       </Header>
