@@ -37,18 +37,7 @@ function App() {
       task[i].id = task[i].id - 1;
     }
     setTasks(task);
-    //console.log(Tasks, e.target.parentNode.parentNode.parentNode.parentNode.childNodes);
-    e.target.parentNode.parentNode.parentNode.parentNode.childNodes.forEach(refreshInput);
     forceUpdate();
-  }
-
-  function refreshInput(e, index) {
-    console.log(e.firstChild.childNodes[1]);
-    if(index < Tasks.length){
-      e.firstChild.childNodes[1].value = Tasks[index].name;
-      console.log(e.firstChild.childNodes[1], e.firstChild.childNodes[1].value);
-      //console.log(e.firstChild.childNodes[1].value, e.firstChild.childNodes[1]);
-    }
   }
 
   function handleChangeName(e, val){
@@ -71,17 +60,24 @@ function App() {
             return (
               <Card style = {{margin: '20px'}}>
                 <MinusSquareOutlined onClick = {(e) => {handleDelete(e, val.id)}}/>
-                <Input 
-                  bordered = {val.selected}
-                  onFocus = {() => {val.selected = true; forceUpdate();}} 
-                  onBlur = {(e) => {
-                    arr[index].name = e.target.value;
-                    setTasks(arr);
-                    val.selected = false;
-                    forceUpdate();}}
-                  defaultValue = {val.name}
-                  onPressEnter = {(e) => {handleChangeName(e, val);}} 
-                  style = {{width: "10vw",}}/>
+                { 
+                  <Input
+                    bordered = {val.selected}
+                    onFocus = {() => {val.selected = true; forceUpdate();}}
+                    onBlur = {(e) => {
+                      arr[index].name = e.target.value;
+                      setTasks(arr);
+                      val.selected = false;
+                      forceUpdate();}}
+                    value = {Tasks[index].name}
+                    onChange = {({ target: { value } }) => {
+                      let task = Tasks;
+                      task[index].name = value;
+                      setTasks(task);
+                      forceUpdate();}}
+                    onPressEnter = {(e) => {handleChangeName(e, val);}}
+                    style = {{width: "10vw",}}/>
+                }
                 <PlusCircleOutlined style = {{float: 'right'}}/>
               </Card>
             )
