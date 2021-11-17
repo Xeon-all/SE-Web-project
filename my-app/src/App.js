@@ -29,10 +29,8 @@ function App() {
     setTasks(task);
   }
 
-  function handleDelete(x) {
+  function handleDelete(e, x) {
     let task = Tasks;
-    console.log(task[x]);
-    task.splice(x, 1);
     for(let i = x; i < task.length; i ++)
     {
       task[i].id = task[i].id - 1;
@@ -60,18 +58,25 @@ function App() {
           {Tasks.map((val, index, arr) => {
             return (
               <Card style = {{margin: '20px'}}>
-                <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
-                <Input 
-                  bordered = {val.selected}
-                  onFocus = {() => {val.selected = true;forceUpdate();}} 
-                  onBlur = {(e) => {
-                    arr[index].name = e.target.value;
-                    setTasks(arr);
-                    val.selected = false;
-                    forceUpdate();}}
-                  defaultValue = {val.name} 
-                  onPressEnter = {(e) => {handleChangeName(e, val);}} 
-                  style = {{width: "10vw",}}/>
+                <MinusSquareOutlined onClick = {(e) => {handleDelete(e, val.id)}}/>
+                { 
+                  <Input
+                    bordered = {val.selected}
+                    onFocus = {() => {val.selected = true; forceUpdate();}}
+                    onBlur = {(e) => {
+                      arr[index].name = e.target.value;
+                      setTasks(arr);
+                      val.selected = false;
+                      forceUpdate();}}
+                    value = {Tasks[index].name}
+                    onChange = {({ target: { value } }) => {
+                      let task = Tasks;
+                      task[index].name = value;
+                      setTasks(task);
+                      forceUpdate();}}
+                    onPressEnter = {(e) => {handleChangeName(e, val);}}
+                    style = {{width: "10vw",}}/>
+                }
                 <PlusCircleOutlined style = {{float: 'right'}}/>
               </Card>
             )
