@@ -29,16 +29,26 @@ function App() {
     setTasks(task);
   }
 
-  function handleDelete(x) {
+  function handleDelete(e, x) {
     let task = Tasks;
-    console.log(task[x]);
     task.splice(x, 1);
     for(let i = x; i < task.length; i ++)
     {
       task[i].id = task[i].id - 1;
     }
     setTasks(task);
+    //console.log(Tasks, e.target.parentNode.parentNode.parentNode.parentNode.childNodes);
+    e.target.parentNode.parentNode.parentNode.parentNode.childNodes.forEach(refreshInput);
     forceUpdate();
+  }
+
+  function refreshInput(e, index) {
+    console.log(e.firstChild.childNodes[1]);
+    if(index < Tasks.length){
+      e.firstChild.childNodes[1].value = Tasks[index].name;
+      console.log(e.firstChild.childNodes[1], e.firstChild.childNodes[1].value);
+      //console.log(e.firstChild.childNodes[1].value, e.firstChild.childNodes[1]);
+    }
   }
 
   function handleChangeName(e, val){
@@ -60,16 +70,16 @@ function App() {
           {Tasks.map((val, index, arr) => {
             return (
               <Card style = {{margin: '20px'}}>
-                <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
+                <MinusSquareOutlined onClick = {(e) => {handleDelete(e, val.id)}}/>
                 <Input 
                   bordered = {val.selected}
-                  onFocus = {() => {val.selected = true;forceUpdate();}} 
+                  onFocus = {() => {val.selected = true; forceUpdate();}} 
                   onBlur = {(e) => {
                     arr[index].name = e.target.value;
                     setTasks(arr);
                     val.selected = false;
                     forceUpdate();}}
-                  defaultValue = {val.name} 
+                  defaultValue = {val.name}
                   onPressEnter = {(e) => {handleChangeName(e, val);}} 
                   style = {{width: "10vw",}}/>
                 <PlusCircleOutlined style = {{float: 'right'}}/>
