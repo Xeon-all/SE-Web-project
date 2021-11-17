@@ -9,6 +9,8 @@ import {
   MinusSquareOutlined,
 } from '@ant-design/icons'
 import { useState, useReducer } from 'react'
+import { request } from './API/api.js';
+import { urls } from './API/urls.js';
 import './App.css';
 
 const { Header, Content, Sider } = Layout;
@@ -29,7 +31,7 @@ function App() {
     setTasks(task);
   }
 
-  function handleDelete(e, x) {
+  function handleDelete(x) {
     let task = Tasks;
     task.splice(x, 1);
     for(let i = x; i < task.length; i ++)
@@ -45,13 +47,48 @@ function App() {
     e.target.blur();
   }
 
+  async function getTask(e){
+    let user = e.target.parentNode.parentNode.childNodes[0].lastChild.value;
+    let password = e.target.parentNode.parentNode.childNodes[1].lastChild.value;
+    let data = {
+      name: user,
+      password: password,
+    }
+    let taskname = await request('get', urls.getTasks, data);
+    let task = {
+      id: 0,
+      name: taskname,
+      selected: false,
+    }
+    console.log(taskname);
+  }
+
+  async function uploadData(tasks){
+    let tasknames = tasks.map((e) => {
+      return e.name;
+    })
+    await request('post', urls.postTasks, tasknames[0])
+    // console.log(tasknames);
+  }
+
+  async function register(e){
+    let user = e.target.parentNode.parentNode.childNodes[0].lastChild.value;
+    let password = e.target.parentNode.parentNode.childNodes[1].lastChild.value;
+    let data = {
+      name: user,
+      password: password,
+    }
+    await request('post', urls.createUser, data);
+  }
+
   return (
     <>
     <Layout>
       <Header>
         <Input prefix = {'user:'} style = {{width: "8vw",}}/>
         <Input prefix = {'password:'} style = {{width: "10vw",}}/>
-        <Button> log in </Button>
+        <Button onClick = {getTask}> log in </Button>
+        <Button onClick = {register}> register </Button>
         <Button style = {{marginLeft: '32%'}} onClick = {handleAdd}>
           add
         </Button>
@@ -62,7 +99,7 @@ function App() {
           {Tasks.map((val, index, arr) => {
             return (
               <Card style = {{margin: '20px'}}>
-                <MinusSquareOutlined onClick = {(e) => {handleDelete(e, val.id)}}/>
+                <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
                 { 
                   <Input
                     bordered = {val.selected}
@@ -70,6 +107,7 @@ function App() {
                     onBlur = {(e) => {
                       arr[index].name = e.target.value;
                       setTasks(arr);
+                      uploadData(arr);
                       val.selected = false;
                       forceUpdate();}}
                     value = {Tasks[index].name}
