@@ -81,6 +81,45 @@ function App() {
     await request('post', urls.createUser, data);
   }
 
+  function drag(ev, drag_id, drag_name) {
+    ev.dataTransfer.setData('drag_id', drag_id);
+    ev.dataTransfer.setData('drag_name', drag_name);
+  };
+
+  function allowDrop(ev)
+  {
+    ev.preventDefault();
+  }
+
+  function dropOnTask(ev, target_id)
+  {
+    ev.preventDefault();
+    var drag_id = ev.dataTransfer.getData('drag_id');
+    var drag_name = ev.dataTransfer.getData('drag_name');
+    let task = Tasks;
+    
+    let drag_task = task[drag_id];
+    task.splice(drag_id, 1);
+    for(let i = drag_id; i < task.length; i ++)
+    {
+      task[i].id -= 1;
+    }
+    task.splice(target_id, 0, [drag_task]);
+    for(let i = target_id + 1; i < task.length; i ++)
+    {
+      task[i].id += 1;
+    }
+    for(let i = 0; i < task.length; i ++)
+    {
+      console.log("the %d target_task id is %d", i + 1, task[i].id);
+    }
+    task[target_id].id = target_id;
+    task[target_id].name = drag_name;
+
+    setTasks(task);
+    forceUpdate();
+  }
+
   return (
     <>
     <Layout>
@@ -98,7 +137,12 @@ function App() {
         <Content>
           {Tasks.map((val, index, arr) => {
             return (
-              <Card style = {{margin: '20px'}}>
+              <Card 
+                style = {{margin: '20px'}}
+                draggable = {true}
+                onDragStart = {(e) => drag(e, val.id, val.name)}
+                onDragOver = {(e) => allowDrop(e)}
+                onDrop = {(e) => dropOnTask(e, val.id)}>
                 <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
                 { 
                   <Input
