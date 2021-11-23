@@ -119,7 +119,7 @@ function App() {
     formData.append('password', token.password);
 
     let result = await request('post', urls.createUser, formData);
-    if(result){
+    if(result.status === 200){
       if(result.status === 200){
         message.success('注册成功!');
       }
