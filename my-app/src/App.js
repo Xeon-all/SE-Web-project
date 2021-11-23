@@ -3,12 +3,14 @@ import {
   Card,
   Layout,
   Input,
+  message,
 } from 'antd'
 import {
   PlusCircleOutlined,
   MinusSquareOutlined,
-} from '@ant-design/icons'
-import { useState, useReducer } from 'react'
+} from '@ant-design/icons';
+import axios from 'axios';
+import { useState, useReducer } from 'react';
 import { request } from './API/api.js';
 import { urls } from './API/urls.js';
 import './App.css';
@@ -17,6 +19,7 @@ const { Header, Content, Sider } = Layout;
 
 function App() {
   const [Tasks, setTasks] = useState([]);
+  const [token, setToken] = useState({});
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   function handleAdd() {
@@ -50,25 +53,56 @@ function App() {
   async function getTask(e){
     let user = e.target.parentNode.parentNode.childNodes[0].lastChild.value;
     let password = e.target.parentNode.parentNode.childNodes[1].lastChild.value;
+    setToken({
+      user: user,
+      password: password,
+    })
     let data = {
       name: user,
       password: password,
     }
+    // const response = await axios({
+    //   method: 'GET',
+    //   baseURL: urls.baseUrl,
+    //   url: urls.getTasks,
+    //   [data]: data,
+    // });
+    // console.log(response);
     let taskname = await request('get', urls.getTasks, data);
-    let task = {
-      id: 0,
-      name: taskname,
-      selected: false,
+    if(taskname.status === 200){
+      let task = [{
+        id: 0,
+        name: taskname.data,
+        selected: false,
+      }]
+      setTasks(task);
+      forceUpdate();
     }
-    console.log(taskname);
+    
   }
 
   async function uploadData(tasks){
     let tasknames = tasks.map((e) => {
       return e.name;
-    })
-    await request('post', urls.postTasks, tasknames[0])
-    // console.log(tasknames);
+    });
+    let data = {...token, task: tasknames[0]};
+    console.log(data);
+
+    let formData = new FormData();
+    formData.append('name', token.user);
+    formData.append('password', token.password);
+    formData.append('task', tasknames[0]);
+    let result = await request('POST', urls.postTasks, formData);
+    console.log(result);
+
+    // const response = await axios({
+    //   method: 'POST',
+    //   baseURL: urls.baseUrl,
+    //   url: urls.postTasks,
+    //   ...token,
+    //   task: tasknames[0],
+    // });
+    //console.log(response);
   }
 
   async function register(e){
@@ -78,7 +112,16 @@ function App() {
       name: user,
       password: password,
     }
-    await request('post', urls.createUser, data);
+    let result = await request('post', urls.createUser, data);
+    if(result){
+      if(result.status === 200){
+        message.success('注册成功!');
+      }
+    }
+    else {
+      message.error('注册失败!');
+    }
+    console.log(result);
   }
 
   return (
