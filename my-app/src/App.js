@@ -108,11 +108,17 @@ function App() {
   async function register(e){
     let user = e.target.parentNode.parentNode.childNodes[0].lastChild.value;
     let password = e.target.parentNode.parentNode.childNodes[1].lastChild.value;
-    let data = {
+    
+    /*let data = {
       name: user,
       password: password,
-    }
-    let result = await request('post', urls.createUser, data);
+    }*/
+
+    let formData = new FormData();
+    formData.append('name', token.user);
+    formData.append('password', token.password);
+
+    let result = await request('post', urls.createUser, formData);
     if(result){
       if(result.status === 200){
         message.success('注册成功!');
