@@ -12,9 +12,6 @@ export const request = async (method, url, params, otherDevURL) => {
           method: method,
           baseURL: urls.baseUrl,
           url: url,
-          headers: {
-            Authorization: "Bearer " + token,
-          },
           [data]: params,
         });
         return response;
