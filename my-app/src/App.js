@@ -21,6 +21,7 @@ import { useState, useReducer } from 'react';
 import { request } from './API/api.js';
 import { urls } from './API/urls.js';
 import './App.css';
+import pic from './Add.png'
 
 const { Header, Content, Sider } = Layout;
 
@@ -250,13 +251,15 @@ function App() {
             </Radio>
           </Space>
         }
-        <Button style = {{marginLeft: '20vw'}} onClick = {handleAdd}>
-          add
-        </Button>
+
       </Header>
       <Layout>
         <Sider style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible></Sider>
         <Content>
+        <div class = "Add">
+          <img src={pic} alt = 'add' width = '100%' height = '100%' 
+          onClick= {handleAdd}/>
+        </div>
           {Tasks.map((val, index, arr) => {
             return (
               <Card 

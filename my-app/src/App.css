@@ -29,6 +29,24 @@
   color: #61dafb;
 }
 
+.Add {
+  width: 80px;
+  height: 80px;
+  position:absolute; 
+  top:-40px; 
+  left:48%; 
+  z-index:1000;
+  border-radius: 50%;
+  opacity: 0.8;
+  box-shadow: 0 0 3px 1px rgba(51, 51, 51, 0.5);
+  transition: 0.3s;
+}
+
+.Add:hover {
+  margin-top: 60px;
+  box-shadow: 0 3px 9px 3px rgba(51, 51, 51, 0.5);
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
