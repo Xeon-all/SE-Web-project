@@ -4,7 +4,7 @@ import { urls } from "../API/urls";
 export const request = async (method, url, params, otherDevURL) => {
   let data = method.toLocaleLowerCase() === 'get' ? 'params' : 'data';
   const token = localStorage.getItem("token");
-  switch (otherDevURL == undefined) {
+  switch (otherDevURL === undefined) {
 
     case true:
       try {
@@ -24,7 +24,6 @@ export const request = async (method, url, params, otherDevURL) => {
           return reason;
         }
       }
-      break;
 
     case false:
       try {
