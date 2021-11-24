@@ -128,9 +128,9 @@ function App() {
     //console.log(response);
   }
 
-  async function register(e){
+  async function register(){
     let formData = new FormData();
-    formData.append('name', tempToken.user);
+    formData.append('name', tempToken.name);
     formData.append('password', tempToken.password);
 
     let result = await request('post', urls.createUser, formData);
@@ -210,7 +210,7 @@ function App() {
         {
           isLogIn?
           <Space>
-            <text style = {{color: 'white'}}>welcome! {token.user}</text>
+            <text style = {{color: 'white'}}>welcome! {token.name}</text>
             <Button onClick = {logOut} type = 'text' danger>log out</Button>
           </Space>
           :
@@ -220,7 +220,7 @@ function App() {
             style = {{width: "8vw",}}
             onChange = {(e) => {
               let temp = {
-                user: e.target.value,
+                name: e.target.value,
                 password: tempToken.password,
               }
               setTempToken(temp)
@@ -231,7 +231,7 @@ function App() {
             style = {{width: "10vw",}}
             onChange = {(e) => {
               let temp = {
-                user: tempToken.user,
+                name: tempToken.name,
                 password: e.target.value,
               }
               setTempToken(temp)
@@ -328,7 +328,7 @@ function App() {
                     onPressEnter = {(e) => {handleChangeName(e, val);}}
                     style = {{width: "10vw",}}/>
                   </Col>
-                  <Col offset = {14}>
+                  <Col offset = {13}>
                     <InfoCircleOutlined onClick = {() => {val.showInfo = true; forceUpdate();}}/>
                     <Modal
                     title = '任务详细信息'
