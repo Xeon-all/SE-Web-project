@@ -111,7 +111,7 @@ function App() {
       return e.name;
     });
     let formData = new FormData();
-    formData.append('name', token.user);
+    formData.append('name', token.name);
     formData.append('password', token.password);
     formData.append('task', tasknames[0]);
     let result = await request('POST', urls.postTasks, formData);
