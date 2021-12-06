@@ -51,6 +51,7 @@ function App() {
       priority: 3,
       name: `第${Tasks.length}个任务`,
       Info: '无',
+      location: '', 
       selected: false,
     }
     
@@ -74,25 +75,44 @@ function App() {
     e.target.blur();
   }
 
+  function handleChangeLocation(e, val){
+    val.location = e.target.location;
+    e.target.blur();
+  }
+
   async function logIn(){
     // let user = '1';
     // let password = '1';
-    let taskname = await request('get', urls.getTasks, tempToken);
-    if(taskname.status === 200){
-      if(taskname.data === 'Wrong password'){
+    let taskn = await request('get', urls.getTasks, tempToken);
+    console.log(taskn);
+    if(taskn.status === 200){
+      if(taskn.data === 'Wrong password'){
         message.error('密码错误!');
       }
-      else if(taskname.data === 'No such user') {
+      else if(taskn.data === 'No such user') {
         message.error('该用户不存在!');
       }
       else {
         setToken(tempToken)
         setIsLogIn(true);
-        let task = [{
+        /*let task = [{
           id: 0,
-          name: taskname.data,
+          name: taskname.data.name,
           selected: false,
-        }]
+        }]*/
+        let task = [];
+        for(let i = 0; i < taskn.data.length; ++i)
+        {
+          task.push({
+            id: taskn.data[i].id,
+            name: taskn.data[i].name,
+            Info: taskn.data[i].Info,
+            priority: taskn.data[i].priority,
+            location: taskn.data[i].location,
+            selected: false,
+            //selectedLocation: false,
+          })
+        }
         setTasks(task);
         forceUpdate();
       }
@@ -108,14 +128,32 @@ function App() {
   }
 
   async function uploadData(tasks){
-    let tasknames = tasks.map((e) => {
-      return e.name;
+    let task = tasks.map((e) => {
+      return e;
     });
-    let formData = new FormData();
+    /*let formData = new FormData();
     formData.append('name', token.name);
     formData.append('password', token.password);
-    formData.append('task', tasknames[0]);
-    let result = await request('POST', urls.postTasks, formData);
+    formData.append('task', tasknames[0]);*/
+    let dict = {};
+    let taskn = [];
+    dict.name = token.name;
+    dict.password = token.password;
+    dict.task = taskn;
+    for(let i = 0; i <task.length; i ++)
+    {
+      let new_task = {};
+      taskn.push(new_task);
+      new_task.name = task[i].name;
+      new_task.Info = task[i].Info;
+      new_task.id = task[i].id;
+      new_task.priority = task[i].priority;
+      new_task.location = task[i].location;
+    }
+
+    console.log(dict);
+
+    let result = await request('POST', urls.postTasks, dict);
     if(result.status !== 200){
       message.error('同步任务失败!');
     }
@@ -305,6 +343,9 @@ function App() {
                       let task = Tasks;
                       task[index].priority = value;
                       setTasks(task);
+                      if(isLogIn){
+                        uploadData(task);
+                      }
                       forceUpdate();}}
                     />
                   </Col>
@@ -328,10 +369,10 @@ function App() {
                       task[index].location = value;
                       setTasks(task);
                       forceUpdate();}}
-                    onPressEnter = {(e) => {handleChangeName(e, val);}}
+                    onPressEnter = {(e) => {handleChangeLocation(e, val);}}
                     style = {{width: "10vw",}}/>
                   </Col>
-                  <Col offset = {13}>
+                  <Col offset = {10}>
                     <InfoCircleOutlined onClick = {() => {val.showInfo = true; forceUpdate();}}/>
                     <Modal
                     title = '任务详细信息'
