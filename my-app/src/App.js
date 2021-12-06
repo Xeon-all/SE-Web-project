@@ -95,11 +95,7 @@ function App() {
       else {
         setToken(tempToken)
         setIsLogIn(true);
-        /*let task = [{
-          id: 0,
-          name: taskname.data.name,
-          selected: false,
-        }]*/
+
         let task = [];
         for(let i = 0; i < taskn.data.length; ++i)
         {
@@ -131,10 +127,7 @@ function App() {
     let task = tasks.map((e) => {
       return e;
     });
-    /*let formData = new FormData();
-    formData.append('name', token.name);
-    formData.append('password', token.password);
-    formData.append('task', tasknames[0]);*/
+
     let dict = {};
     let taskn = [];
     dict.name = token.name;
@@ -150,8 +143,6 @@ function App() {
       new_task.priority = task[i].priority;
       new_task.location = task[i].location;
     }
-
-    console.log(dict);
 
     let result = await request('POST', urls.postTasks, dict);
     if(result.status !== 200){
@@ -188,9 +179,8 @@ function App() {
     }
   }
 
-  function drag(ev, drag_id, drag_name) {
-    ev.dataTransfer.setData('drag_id', drag_id);
-    ev.dataTransfer.setData('drag_name', drag_name);
+  function drag(ev, val) {
+    ev.dataTransfer.setData('drag_id', val.id);
   };
 
   function allowDrop(ev)
@@ -202,7 +192,6 @@ function App() {
   {
     ev.preventDefault();
     var drag_id = ev.dataTransfer.getData('drag_id');
-    var drag_name = ev.dataTransfer.getData('drag_name');
     let task = Tasks;
     
     let drag_task = task[drag_id];
@@ -211,19 +200,17 @@ function App() {
     {
       task[i].id -= 1;
     }
-    task.splice(target_id, 0, [drag_task]);
+    task.splice(target_id, 0, drag_task);
     for(let i = target_id + 1; i < task.length; i ++)
     {
       task[i].id += 1;
     }
-    for(let i = 0; i < task.length; i ++)
-    {
-      console.log("the %d target_task id is %d", i + 1, task[i].id);
-    }
     task[target_id].id = target_id;
-    task[target_id].name = drag_name;
 
     setTasks(task);
+    if(isLogIn){
+      uploadData(task);
+    }
     forceUpdate();
   }
 
@@ -303,7 +290,7 @@ function App() {
               <Card 
               style = {{margin: '20px', backgroundColor: priorityLevel[val.priority]}}
               draggable = {isDraggable}
-              onDragStart = {(e) => drag(e, val.id, val.name)}
+              onDragStart = {(e) => drag(e, val)}
               onDragOver = {(e) => allowDrop(e)}
               onDrop = {(e) => dropOnTask(e, val.id)}>
                 <Row align = 'middle' gutter = {16}>
