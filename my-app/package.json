@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^12.1.10",
     "antd": "^4.15.2",
     "axios": "^0.20.0",
+    "crypto-js": "^4.1.1",
     "element-react": "^1.4.34",
     "element-theme-default": "^1.4.13",
     "element-ui": "^2.15.2",
