@@ -59,6 +59,37 @@ function App() {
     setTasks(task);
   }
 
+  function SwapTask(t1, t2) {
+    let task = Tasks;
+    let t_id = task[t1].id, t_priority = task[t1].priority, 
+    t_name = task[t1].name, t_Info = task[t1].Info,
+    t_location = task[t1].location, t_selected = task[t1].selected;
+    task[t1].id = task[t2].id;
+    task[t1].priority = task[t2].priority;
+    task[t1].name = task[t2].name;
+    task[t1].Info = task[t2].Info;
+    task[t1].location = task[t2].location;
+    task[t1].selected = task[t2].selected;
+    task[t2].id = t_id;
+    task[t2].priority = t_priority;
+    task[t2].name = t_name;
+    task[t2].Info = t_Info;
+    task[t2].location = t_location;
+    task[t2].selected = t_selected;
+  }
+
+  function SortPriority() {
+    let task = Tasks;
+    for(let i = 0; i < task.length; i++)
+    {
+      for(let j = 0; j < task.length - i - 1; j++)
+      {
+        if(task[j].priority > task[j+1].priority)
+          SwapTask(j, j + 1);
+      }
+    }
+  }
+
   function handleDelete(x) {
     let task = Tasks;
     task.splice(x, 1);
@@ -330,8 +361,15 @@ function App() {
                       let task = Tasks;
                       task[index].priority = value;
                       setTasks(task);
+                      
                       if(isLogIn){
                         uploadData(task);
+                      }
+                      forceUpdate();}}
+                    onBlur = {() => {
+                      SortPriority();
+                      if(isLogIn){
+                        uploadData(Tasks);
                       }
                       forceUpdate();}}
                     />
