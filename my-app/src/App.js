@@ -17,7 +17,7 @@ import {
   EnvironmentOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
-import { useState, useReducer } from 'react';
+import React, { useState, useReducer } from 'react';
 import { request } from './API/api.js';
 import { urls } from './API/urls.js';
 import './App.css';
@@ -36,6 +36,8 @@ function App() {
   const [isLogIn, setIsLogIn] = useState(false);
   const [isDraggable, setIsDraggable] = useState(true);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+  const [modelLog, setModelLog] = useState(false);
+  const [modelReg, setModelReg] = useState(false);
 
   const priorityLevel = [
     '#EB5558',
@@ -88,6 +90,7 @@ function App() {
           SwapTask(j, j + 1);
       }
     }
+    setTasks(task);
   }
 
   function handleDelete(x) {
@@ -263,6 +266,34 @@ function App() {
     }
   }
 
+  function showLog() {
+    let model = modelLog;
+    model = true;
+    setModelLog(model);
+    forceUpdate();
+  }
+
+  function hideLog() {
+    let model = modelLog;
+    model = false;
+    setModelLog(model);
+    forceUpdate();
+  }
+
+  function showReg() {
+    let model = modelReg;
+    model = true;
+    setModelReg(model);
+    forceUpdate();
+  }
+
+  function hideReg() {
+    let model = modelReg;
+    model = false;
+    setModelReg(model);
+    forceUpdate();
+  }
+
   return (
     <>
     <Layout>
@@ -275,8 +306,44 @@ function App() {
           </Space>
           :
           <Space>
-            <Input 
-            prefix = {'user:'} 
+            <Radio.Group>
+              <Radio.Button
+              type = 'primary'
+              onClick = {() => {showReg();}}
+              >
+                注册
+              </Radio.Button>
+              <Radio.Button
+              type = 'primary'
+              onClick = {() => {showLog();}}
+              >
+                登陆
+              </Radio.Button>
+            </Radio.Group>
+            <Modal
+            visible = {modelLog | modelReg}
+            onOK = {() => {hideLog(); hideReg();}}
+            onCancel = {() => {hideLog(); hideReg();}}
+            footer = {[
+              modelLog?
+              <Button
+              type = 'primary'
+              onClick = {() => {logIn(); hideLog(); hideReg();}}
+              >
+                登陆
+              </Button>
+              :
+              <Button
+              type = 'primary'
+              onClick = {() => {register(); hideLog(); hideReg();}}
+              >
+                注册
+              </Button>
+            ]}
+            >
+            <Space direction="vertical">
+            <Input
+            placeholder = {'user:'} 
             style = {{width: "8vw",}}
             onChange = {(e) => {
               let temp = {
@@ -287,7 +354,7 @@ function App() {
             }}
             />
             <Input.Password 
-            prefix = {'password:'} 
+            placeholder = {'password:'} 
             style = {{width: "10vw",}}
             onChange = {(e) => {
               let temp = {
@@ -297,20 +364,10 @@ function App() {
               setTempToken(temp)
             }}
             />
-            { 
-              !isRegisting
-              ? <Button onClick = {logIn}> log in </Button>
-              : <Button onClick = {register}>register </Button>}
-            <Radio 
-              checked = {isRegisting}
-              onClick = {() => {setIsRegisting(!isRegisting)}}
-              style = {{color: 'white'}}
-              > 
-              register 
-            </Radio>
+            </Space>
+            </Modal>
           </Space>
         }
-
       </Header>
       <Layout>
         <Sider style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible></Sider>
