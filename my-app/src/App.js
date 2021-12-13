@@ -117,11 +117,14 @@ function App() {
     let taskn = await request('get', urls.getTasks, tempToken);
     console.log(taskn);
     if(taskn.status === 200){
-      if(taskn.data === 'Wrong password'){
+      if(taskn.data === 'Wrong password' || taskn.data === 'No password'){
         message.error('密码错误!');
       }
       else if(taskn.data === 'No such user') {
         message.error('该用户不存在!');
+      }
+      else if(taskn.data === 'Lack of name') {
+        message.error('请输入用户名!')
       }
       else {
         setToken(tempToken)
