@@ -15,6 +15,7 @@ import {
   InfoCircleOutlined,
   MinusSquareOutlined,
   EnvironmentOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
 import { useState, useReducer } from 'react';
@@ -22,11 +23,28 @@ import { request } from './API/api.js';
 import { urls } from './API/urls.js';
 import './App.css';
 import pic from './Add.png'
+import tagpic from './tagAdd.png'
+import delpic from './delete.png'
+import Item from 'antd/lib/list/Item';
 
 const { Header, Content, Sider } = Layout;
 
 function App() {
   const [Tasks, setTasks] = useState([]);
+  const [Tags, setTags] = useState(
+    [{id: 1, name: '学习', selected: 0},
+    {id: 2, name: '工作', selected: 0},
+    {id: 3, name: '生活', selected: 0}]
+    );
+  const [tagType, setType] = useState([
+      'white',
+      '#00c5fb',
+      '#c8e78f',
+      '#66b687',
+      '#8fb1c5',
+      '#ab8ee0',
+      '#ffaec6'
+    ]);
   const [token, setToken] = useState({});
   const [tempToken, setTempToken] = useState({
     user: '',
@@ -44,7 +62,7 @@ function App() {
     '#FFFFFF',
     '#DDDDDD'
   ]
-
+  
   function handleAdd() {
     let newTask = {
       id: Tasks.length,
@@ -53,10 +71,59 @@ function App() {
       Info: '无',
       location: '', 
       selected: false,
+      tag: 0,
     }
     
     let task = [...Tasks, newTask];
     setTasks(task);
+  }
+
+  function handleAddTag() {
+    let newTag = {
+      id: Tags.length + 1,
+      name:'',
+      selected: 0,
+    }
+
+    let tag = [...Tags, newTag];
+    setTags(tag);
+  }
+
+  function handleDelTag(x) {
+    let id = x - 1;
+
+    if(x < Tags.length){
+      let tagtype = tagType;
+      let last = tagtype[6];
+      tagtype[6] = tagtype[x];
+      for(let i = x; i < 5; i ++){
+        tagtype[i] = tagtype[i+1];
+      }
+      tagtype[5] = last;
+      setType(tagtype);
+    }
+
+    let tag = Tags;
+    tag.splice(id, 1);
+    for(let i = id; i < tag.length; i ++)
+    {
+      tag[i].id --;
+    }
+    setTags(tag);
+
+    let task = Tasks;
+    for(let i = 0; i < task.length; i ++)
+    {
+      if(task[i].tag == x){
+        task[i].tag = 0;
+      }
+      if(task[i].tag > x){
+        task[i].tag --;
+      }
+    }
+    setTasks(task);
+    
+    forceUpdate();
   }
 
   function handleDelete(x) {
@@ -175,12 +242,18 @@ function App() {
       }
     }
     else {
-      message.error('注册失败：网络问题!');
+      message.error('注册失败: 网络问题!');
     }
   }
 
-  function drag(ev, val) {
+  function dragTask(ev, val) {
     ev.dataTransfer.setData('drag_id', val.id);
+    ev.dataTransfer.setData('drag_type', 0);
+  };
+  
+  function dragTag(ev, val) {
+    ev.dataTransfer.setData('tag_id', val.id);
+    ev.dataTransfer.setData('drag_type', 1);
   };
 
   function allowDrop(ev)
@@ -191,21 +264,25 @@ function App() {
   function dropOnTask(ev, target_id)
   {
     ev.preventDefault();
-    var drag_id = ev.dataTransfer.getData('drag_id');
     let task = Tasks;
-    
-    let drag_task = task[drag_id];
-    task.splice(drag_id, 1);
-    for(let i = drag_id; i < task.length; i ++)
-    {
-      task[i].id -= 1;
+
+    if(ev.dataTransfer.getData('drag_type') == 1){
+      var tag_id = ev.dataTransfer.getData('tag_id');
+      task[target_id].tag = tag_id;
     }
-    task.splice(target_id, 0, drag_task);
-    for(let i = target_id + 1; i < task.length; i ++)
-    {
-      task[i].id += 1;
+    else{
+      var drag_id = ev.dataTransfer.getData('drag_id');
+      let drag_task = task[drag_id];
+      task.splice(drag_id, 1);
+      for(let i = drag_id; i < task.length; i ++){
+        task[i].id -= 1;
+      }
+      task.splice(target_id, 0, drag_task);
+      for(let i = target_id + 1; i < task.length; i ++){
+        task[i].id += 1;
+      }
+      task[target_id].id = target_id;
     }
-    task[target_id].id = target_id;
 
     setTasks(task);
     if(isLogIn){
@@ -279,18 +356,70 @@ function App() {
 
       </Header>
       <Layout>
-        <Sider style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible></Sider>
+        <Sider class = 'Sider' style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible>
+          {Tags.map((val, index, arr) => {
+            return (
+              <div 
+              class = {val.id == 1? "Tag1":"Tag"}
+              key = {index}
+              style = {{backgroundColor: tagType[val.id]}}
+              draggable = {isDraggable}
+              onDragStart = {(e) => dragTag(e, val)}
+              onMouseOver = {() => {val.selected = true; forceUpdate();}}
+              onMouseOut={() => {val.selected = false; forceUpdate();}}
+              >
+              <Row>
+                <Col>
+                  <Input 
+                  bordered = {0}
+                  value = {arr[index].name}
+                  style = {{width: "4vw"}}
+                  onFocus = {() => {setIsDraggable(false); forceUpdate();}}
+                  onBlur = {(e) => {
+                    arr[index].name = e.target.value;
+                    setTags(arr);
+                    setIsDraggable(true);
+                    if(isLogIn){
+                      uploadData(arr);
+                    }
+                    val.selected = false;
+                    forceUpdate();}}
+                    onChange = {({ target: { value } }) => {
+                    let tag = Tags;
+                    tag[index].name = value;
+                    setTags(tag);
+                    forceUpdate();}}
+                    onPressEnter = {(e) => {handleChangeName(e, val);}}/>
+                </Col>
+                <div class = 'del' >
+                  <img src={delpic} alt = 'del' 
+                  width = '40%' height = '40%'
+                  style = {{visibility: val.selected == 1? 'visible':'hidden'}}
+                  onClick = {() => handleDelTag(val.id)}/>
+                </div>
+              </Row>
+            </div>
+          )})}
+          <div 
+          style = {{backgroundColor: 'white', visibility: Tags.length < 6? 'visible':'hidden'}}
+          class = "TagAdd" 
+          onClick = {handleAddTag}>
+            <img src={tagpic} alt = 'add' 
+            width = '40%' height = '40%' 
+            style = {{marginTop: '30%', marginLeft: '30%'}}/>
+          </div>
+        </Sider>
         <Content>
         <div class = "Add">
-          <img src={pic} alt = 'add' width = '100%' height = '100%' 
-          onClick= {handleAdd}/>
+          <img src = {pic} alt = 'add' width = '100%' height = '100%' 
+          onClick = {handleAdd}/>
         </div>
           {Tasks.map((val, index, arr) => {
             return (
               <Card 
               style = {{margin: '20px', backgroundColor: priorityLevel[val.priority]}}
               draggable = {isDraggable}
-              onDragStart = {(e) => drag(e, val)}
+              onDragStart = {(e) => dragTask(e, val)}
               onDragOver = {(e) => allowDrop(e)}
               onDrop = {(e) => dropOnTask(e, val.id)}>
                 <Row align = 'middle' gutter = {16}>
@@ -317,7 +446,7 @@ function App() {
                       setTasks(task);
                       forceUpdate();}}
                     onPressEnter = {(e) => {handleChangeName(e, val);}}
-                    style = {{width: "10vw",}}/>
+                    style = {{width: "10vw", backgroundColor: tagType[val.tag]}}/>
                   </Col>
                   <Col span = {2}>
                     <Slider

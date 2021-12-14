@@ -32,7 +32,7 @@
 .Add {
   width: 80px;
   height: 80px;
-  position:absolute; 
+  position: absolute; 
   top:-40px; 
   left:48%; 
   z-index:1000;
@@ -45,6 +45,74 @@
 .Add:hover {
   margin-top: 60px;
   box-shadow: 0 3px 9px 3px rgba(51, 51, 51, 0.5);
+}
+
+.Sider {
+  overflow-x:hidden;
+}
+
+.Tag {
+  width: 80px;
+  height: 80px;
+  margin-top: -20px;
+  margin-left: 30%;
+  opacity: 0.8;
+  box-shadow: 0 0 3px 1px rgba(51, 51, 51, 0.5);
+  transition: 0.3s;
+}
+
+.Tag:hover {
+  margin-top: -45px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 9px 3px rgba(31, 31, 31, 0.5);
+}
+
+.Tag1 {
+  width: 80px;
+  height: 80px;
+  margin-top: 30px;
+  margin-left: 30%;
+  opacity: 0.8;
+  box-shadow: 0 0 3px 1px rgba(51, 51, 51, 0.5);
+  transition: 0.3s;
+}
+
+.Tag1:hover {
+  margin-top: 5px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 9px 3px rgba(31, 31, 31, 0.5);
+}
+
+.TagAdd {
+  width: 80px;
+  height: 80px;
+  margin-top: -20px;
+  margin-left: 30%;
+  z-index: 1000; 
+  opacity: 0.3;
+  box-shadow: 0 0 3px 1px rgba(51, 51, 51, 0.5);
+}
+
+.TagAdd:hover {
+  width: 90px;
+  height: 90px;
+  margin-top: -30px;
+  margin-left: 27.5%;
+  box-shadow: 0 3px 9px 3px rgba(31, 31, 31, 0.5);
+}
+
+.del {
+  width: 20px;
+  height: 20px;
+  z-index: 1000; 
+  position: absolute;
+  margin-top: -8px;
+  margin-left: 71px;
+  opacity: 0.6;
+}
+
+.del:hover {
+  opacity: 1;
 }
 
 @keyframes App-logo-spin {
