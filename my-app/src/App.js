@@ -322,6 +322,8 @@ function App() {
             </Radio.Group>
             <Modal
             visible = {modelLog | modelReg}
+            centered
+            width = {300}
             onOK = {() => {hideLog(); hideReg();}}
             onCancel = {() => {hideLog(); hideReg();}}
             footer = {[
