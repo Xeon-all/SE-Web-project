@@ -85,6 +85,7 @@ function App() {
     // let user = '1';
     // let password = '1';
     let taskn = await request('get', urls.getTasks, tempToken);
+    console.log(taskn);
     if(taskn.status === 200){
       if(taskn.data === 'Wrong password'){
         message.error('密码错误!');
@@ -149,6 +150,7 @@ function App() {
       new_task.priority = task[i].priority;
       new_task.location = task[i].location;
     }
+
     let result = await request('POST', urls.postTasks, dict);
     if(result.status !== 200){
       message.error('同步任务失败!');
