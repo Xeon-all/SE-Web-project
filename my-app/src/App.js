@@ -10,11 +10,15 @@ import {
   Space,
   Modal,
   Slider,
+  ConfigProvider,
+  DatePicker,
+  Select,
 } from 'antd'
 import {
   InfoCircleOutlined,
   MinusSquareOutlined,
   EnvironmentOutlined,
+  ClockCircleOutlined,
   CloseOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
@@ -26,6 +30,9 @@ import pic from './Add.png'
 import tagpic from './tagAdd.png'
 import delpic from './delete.png'
 import Item from 'antd/lib/list/Item';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+import locale from 'antd/lib/locale/zh_CN';
 
 const { Header, Content, Sider } = Layout;
 
@@ -72,6 +79,7 @@ function App() {
       name: `第${Tasks.length}个任务`,
       Info: '无',
       location: '', 
+      clock: 0,
       tag: 0,
       selected: false,
     }
@@ -137,17 +145,20 @@ function App() {
     let task = Tasks;
     let t_priority = task[t1].priority, t_tag = task[t1].tag,
     t_name = task[t1].name, t_Info = task[t1].Info,
-    t_location = task[t1].location, t_selected = task[t1].selected;
+    t_location = task[t1].location, t_clock = task[t1].clock,
+     t_selected = task[t1].selected;
     task[t1].priority = task[t2].priority;
     task[t1].name = task[t2].name;
     task[t1].Info = task[t2].Info;
     task[t1].location = task[t2].location;
+    task[t1].clock = task[t2].clock;
     task[t1].selected = task[t2].selected;
     task[t1].tag = task[t2].tag;
     task[t2].priority = t_priority;
     task[t2].name = t_name;
     task[t2].Info = t_Info;
     task[t2].location = t_location;
+    task[t2].clock = t_clock;
     task[t2].selected = t_selected;
     task[t2].tag = t_tag;
   }
@@ -217,6 +228,7 @@ function App() {
             Info: val.data[i].Info,
             priority: val.data[i].priority,
             location: val.data[i].location,
+            clock: val.data[i].clock,
             tag: val.data[i].tag,
             selected: false,
             //selectedLocation: false,
@@ -266,6 +278,7 @@ function App() {
       new_task.id = task[i].id;
       new_task.priority = task[i].priority;
       new_task.location = task[i].location;
+      new_task.clock = task[i].clock;
       new_task.tag = task[i].tag;
     }
     let new_task = {};
@@ -612,7 +625,31 @@ function App() {
                     onPressEnter = {(e) => {handleChangeLocation(e, val);}}
                     style = {{width: "10vw",}}/>
                   </Col>
-                  <Col offset = {10}>
+                  <Col>
+                    <ClockCircleOutlined style = {{paddingRight: '1rem'}}/>
+                    <ConfigProvider locale={locale}>
+                      <DatePicker 
+                      bordered = {val.selectedClock}
+                      onFocus = {() => {val.selectedClock = true; setIsDraggable(false); forceUpdate();}}
+                      onBlur = {() => {
+                        //arr[index].clock = e.target.value;
+                        //setTasks(arr);
+                        setIsDraggable(true);
+                        if(isLogIn){
+                          uploadData(arr);
+                        }
+                        val.selectedClock = false;
+                        forceUpdate();}}
+                      value = {Tasks[index].clock == 0 ? null : moment(Tasks[index].clock)}
+                      onChange = {(e) => {
+                        console.log(typeof(e._d.valueOf()));
+                        let task = Tasks;
+                        task[index].clock = e._d.valueOf();
+                        setTasks(task);
+                        forceUpdate();}}/>
+                    </ConfigProvider>
+                  </Col>
+                  <Col offset = {7}>
                     <InfoCircleOutlined onClick = {() => {val.showInfo = true; forceUpdate();}}/>
                     <Modal
                     title = '任务详细信息'
