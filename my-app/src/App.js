@@ -10,11 +10,16 @@ import {
   Space,
   Modal,
   Slider,
+  ConfigProvider,
+  DatePicker,
+  Popconfirm,
+  Select,
 } from 'antd'
 import {
   InfoCircleOutlined,
   MinusSquareOutlined,
   EnvironmentOutlined,
+  ClockCircleOutlined,
   CloseOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
@@ -26,8 +31,12 @@ import pic from './Add.png'
 import tagpic from './tagAdd.png'
 import delpic from './delete.png'
 import Item from 'antd/lib/list/Item';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+import locale from 'antd/lib/locale/zh_CN';
 
 const { Header, Content, Sider } = Layout;
+const { TextArea } = Input;
 
 function App() {
   const [Tasks, setTasks] = useState([]);
@@ -47,7 +56,7 @@ function App() {
     ]);
   const [token, setToken] = useState({});
   const [tempToken, setTempToken] = useState({
-    user: '',
+    name: '',
     password: '',
   });
   const [isRegisting, setIsRegisting] = useState(false);
@@ -72,6 +81,7 @@ function App() {
       name: `第${Tasks.length}个任务`,
       Info: '无',
       location: '', 
+      clock: 0,
       tag: 0,
       selected: false,
     }
@@ -130,6 +140,9 @@ function App() {
     }
     setTasks(task);
     
+    if(isLogIn) {
+      uploadData(Tasks);
+    }
     forceUpdate();
   }
 
@@ -137,19 +150,22 @@ function App() {
     let task = Tasks;
     let t_priority = task[t1].priority, t_tag = task[t1].tag,
     t_name = task[t1].name, t_Info = task[t1].Info,
-    t_location = task[t1].location, t_selected = task[t1].selected;
+    t_location = task[t1].location, t_clock = task[t1].clock,
+    t_selected = task[t1].selected;
     task[t1].priority = task[t2].priority;
     task[t1].name = task[t2].name;
     task[t1].Info = task[t2].Info;
     task[t1].location = task[t2].location;
     task[t1].selected = task[t2].selected;
     task[t1].tag = task[t2].tag;
+    task[t1].clock = task[t2].clock;
     task[t2].priority = t_priority;
     task[t2].name = t_name;
     task[t2].Info = t_Info;
     task[t2].location = t_location;
     task[t2].selected = t_selected;
     task[t2].tag = t_tag;
+    task[t2].clock = t_clock;
   }
 
   function SortPriority() {
@@ -173,6 +189,9 @@ function App() {
       task[i].id = task[i].id - 1;
     }
     setTasks(task);
+    if(isLogIn) {
+      uploadData(Tasks);
+    }
     forceUpdate();
   }
 
@@ -182,13 +201,16 @@ function App() {
   }
 
   function handleChangeLocation(e, val){
-    val.location = e.target.location;
+    val.location = e.target.value;
+    e.target.blur();
+  }
+
+  function handleChangeInfo(e, val){
+    val.Info = e.target.value;
     e.target.blur();
   }
 
   async function logIn(){
-    // let user = '1';
-    // let password = '1';
     let val = await request('get', urls.getTasks, tempToken);
     console.log(val);
     if(val.status === 200){
@@ -217,6 +239,7 @@ function App() {
             Info: val.data[i].Info,
             priority: val.data[i].priority,
             location: val.data[i].location,
+            clock: val.data[i].clock,
             tag: val.data[i].tag,
             selected: false,
             //selectedLocation: false,
@@ -248,7 +271,7 @@ function App() {
     setTags([]);
   }
 
-  async function uploadData(tasks, tags){
+  async function uploadData(tasks){
     let task = tasks.map((e) => {
       return e;
     });
@@ -267,6 +290,7 @@ function App() {
       new_task.id = task[i].id;
       new_task.priority = task[i].priority;
       new_task.location = task[i].location;
+      new_task.clock = task[i].clock;
       new_task.tag = task[i].tag;
     }
     let new_task = {};
@@ -292,6 +316,18 @@ function App() {
     let formData = new FormData();
     formData.append('name', tempToken.name);
     formData.append('password', tempToken.password);
+
+    if(tempToken.name.length > 20)
+    {
+      message.error('用户名超过20个字符!');
+      return;
+    }
+
+    if(!tempToken.name.match("^[a-zA-Z0-9]+$"))
+    {
+      message.error('用户名包含非法字符!');
+      return;
+    }
 
     let result = await request('post', urls.createUser, formData);
     if(result.status && result.status === 200){
@@ -543,7 +579,14 @@ function App() {
               onDrop = {(e) => dropOnTask(e, val.id)}>
                 <Row align = 'middle' gutter = {16}>
                   <Col>
-                    <MinusSquareOutlined onClick = {() => {handleDelete(val.id)}}/>
+                    <Popconfirm
+                      title="确定删除任务?"
+                      okText="是"
+                      cancelText="否"
+                      onConfirm={() => {handleDelete(val.id)}}
+                    >
+                      <MinusSquareOutlined/>
+                    </Popconfirm>
                   </Col>
                   <Col>
                     <Input
@@ -613,7 +656,31 @@ function App() {
                     onPressEnter = {(e) => {handleChangeLocation(e, val);}}
                     style = {{width: "10vw",}}/>
                   </Col>
-                  <Col offset = {10}>
+                  <Col>
+                    <ClockCircleOutlined style = {{paddingRight: '1rem'}}/>
+                    <ConfigProvider locale={locale}>
+                      <DatePicker 
+                      bordered = {val.selectedClock}
+                      onFocus = {() => {val.selectedClock = true; setIsDraggable(false); forceUpdate();}}
+                      onBlur = {() => {
+                        //arr[index].clock = e.target.value;
+                        //setTasks(arr);
+                        setIsDraggable(true);
+                        if(isLogIn){
+                          uploadData(arr);
+                        }
+                        val.selectedClock = false;
+                        forceUpdate();}}
+                      value = {Tasks[index].clock == 0 ? null : moment(Tasks[index].clock)}
+                      onChange = {(e) => {
+                        console.log(typeof(e._d.valueOf()));
+                        let task = Tasks;
+                        task[index].clock = e == null? 0 : e._d.valueOf();
+                        setTasks(task);
+                        forceUpdate();}}/>
+                    </ConfigProvider>
+                  </Col>
+                  <Col offset = {6}>
                     <InfoCircleOutlined onClick = {() => {val.showInfo = true; forceUpdate();}}/>
                     <Modal
                     title = '任务详细信息'
@@ -629,7 +696,23 @@ function App() {
                       </Button>
                     ]}
                     >
-                      <p>{val.Info}</p>
+                    <TextArea rows={4}
+                      style = {{width: "35vw",}}
+                      onBlur = {(e) => {
+                        arr[index].Info = e.target.value;
+                        setTasks(arr);
+                        if(isLogIn){
+                          uploadData(arr);
+                        }
+                        forceUpdate();}}
+                      value = {Tasks[index].Info}
+                      onChange = {({ target: { value } }) => {
+                        let task = Tasks;
+                        task[index].Info = value;
+                        setTasks(task);
+                        forceUpdate();}}
+                      onPressEnter = {(e) => {handleChangeInfo(e, val);}}
+                    />
                     </Modal>
                   </Col>
                 </Row>
