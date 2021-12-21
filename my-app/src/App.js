@@ -245,6 +245,7 @@ function App() {
     setTempToken({});
     setToken({});
     setTasks([]);
+    setTags([]);
   }
 
   async function uploadData(tasks, tags){
