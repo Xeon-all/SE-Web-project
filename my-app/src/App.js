@@ -34,6 +34,7 @@ import Item from 'antd/lib/list/Item';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import locale from 'antd/lib/locale/zh_CN';
+import CryptoJs from 'crypto-js';
 
 const { Header, Content, Sider } = Layout;
 const { TextArea } = Input;
@@ -322,20 +323,37 @@ function App() {
       new_tag.selected = Tags[i].selected;
     }
     console.log(dict);
-    let str = 'name' + dict.name + 'password' + dict.password + 'task';
-    for(let i = 0; i < taskn.length; ++i)
+    //let str = 'name' + dict.name + 'password' + dict.password + 'task';
+    let strlength = 23;
+    for(let i = 0; i < task.length; ++i)
     {
-      str += 'name' + taskn.name;
-      str += 'Info' + taskn.Info;
-      str += 'id' + taskn.id;
-      str += 'priority' + taskn.priority;
-      str += 'location' + taskn.location;
-      str += 'clock' + taskn.clock;
-      str += 'tag' + taskn.tag;
+      strlength += 86;
+      strlength += task[i].name.length;
+      strlength += task[i].Info.length;
+      strlength += task[i].id.toString().length;
+      strlength += task[i].priority.toString().length;
+      strlength += task[i].location.length;
+      strlength += task[i].clock.toString().length;
+      strlength += task[i].tag.length;
+      // str += 'name' + taskn[i].name;
+      // str += 'Info' + taskn[i].Info;
+      // str += 'id' + taskn[i].id;
+      // str += 'priority' + taskn[i].priority;
+      // str += 'location' + taskn[i].location;
+      // str += 'clock' + taskn[i].clock;
+      // str += 'tag' + taskn[i].tag;
     }
-    if(str.length > 1000)
+    for(let i = 0; i < Tags.length; i++)
     {
-      message.error('任务信息超过1000字符!');
+      strlength += 36
+      strlength += Tags[i].id.toString().length;
+      strlength += Tags[i].name.length;
+      strlength += Tags[i].selected ? 4 : 5;
+    }
+    strlength -= 2;
+    if(strlength > 1000)
+    {
+      message.error('任务信息过长，超过1000字符!');
       return;
     }
 
@@ -531,9 +549,10 @@ function App() {
             placeholder = {'password:'} 
             style = {{width: "12vw",}}
             onChange = {(e) => {
+              const pwd = CryptoJs.MD5(CryptoJs.MD5(e.target.value).toString()).toString()
               let temp = {
                 name: tempToken.name,
-                password: e.target.value,
+                password: pwd,
               }
               setTempToken(temp)
             }}
