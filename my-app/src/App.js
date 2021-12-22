@@ -335,7 +335,7 @@ function App() {
       strlength += task[i].priority.toString().length;
       strlength += task[i].location.replace(/[^\x00-\xff]/g,"010101").length;
       strlength += task[i].clock.toString().length;
-      strlength += task[i].tag === 0 ? -1 : task[i].tag.replace(/[^\x00-\xff]/g,"010101").length;
+      strlength += task[i].tag === 0 ? -1 : task[i].tag.length;
       // str += 'name' + taskn[i].name;
       // str += 'Info' + taskn[i].Info;
       // str += 'id' + taskn[i].id;
