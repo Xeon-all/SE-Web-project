@@ -328,13 +328,14 @@ function App() {
     for(let i = 0; i < task.length; ++i)
     {
       strlength += 86;
-      strlength += task[i].name.length;
-      strlength += task[i].Info.length;
+      //str.replace(/[^\x00-\xff]/g,"01").length
+      strlength += task[i].name.replace(/[^\x00-\xff]/g,"010101").length;
+      strlength += task[i].Info.replace(/[^\x00-\xff]/g,"010101").length;
       strlength += task[i].id.toString().length;
       strlength += task[i].priority.toString().length;
-      strlength += task[i].location.length;
+      strlength += task[i].location.replace(/[^\x00-\xff]/g,"010101").length;
       strlength += task[i].clock.toString().length;
-      strlength += task[i].tag.length;
+      strlength += task[i].tag === 0 ? -1 : task[i].tag.replace(/[^\x00-\xff]/g,"010101").length;
       // str += 'name' + taskn[i].name;
       // str += 'Info' + taskn[i].Info;
       // str += 'id' + taskn[i].id;
@@ -347,7 +348,7 @@ function App() {
     {
       strlength += 36
       strlength += Tags[i].id.toString().length;
-      strlength += Tags[i].name.length;
+      strlength += Tags[i].name.replace(/[^\x00-\xff]/g,"010101").length;
       strlength += Tags[i].selected ? 4 : 5;
     }
     strlength -= 2;
