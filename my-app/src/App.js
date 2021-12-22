@@ -224,6 +224,23 @@ function App() {
         message.error('请输入用户名!')
       }
       else {
+        if(tempToken.name == null || tempToken.password == null)
+        {
+          message.error('用户信息错误!');
+          return;
+        }
+        if(val.data.length > 0)
+        {
+          if(!val.data[0].name == null || !val.data[0].id == null ||
+          !val.data[0].Info == null || !val.data[0].priority == null ||
+          !val.data[0].location == null || !val.data[0].clock == null ||
+          !val.data[0].tag == null)
+          {
+            message.error('任务格式错误!');
+            return;
+          }
+        }
+
         setToken(tempToken)
         setIsLogIn(true);
 
@@ -305,6 +322,22 @@ function App() {
       new_tag.selected = Tags[i].selected;
     }
     console.log(dict);
+    let str = 'name' + dict.name + 'password' + dict.password + 'task';
+    for(let i = 0; i < taskn.length; ++i)
+    {
+      str += 'name' + taskn.name;
+      str += 'Info' + taskn.Info;
+      str += 'id' + taskn.id;
+      str += 'priority' + taskn.priority;
+      str += 'location' + taskn.location;
+      str += 'clock' + taskn.clock;
+      str += 'tag' + taskn.tag;
+    }
+    if(str.length > 1000)
+    {
+      message.error('任务信息超过1000字符!');
+      return;
+    }
 
     let result = await request('POST', urls.postTasks, dict);
     if(result.status !== 200){
@@ -511,7 +544,7 @@ function App() {
         }
       </Header>
       <Layout>
-        <Sider class = 'Sider' style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible>
+        <Sider class = 'Sider' style = {{background: '#49C7CD', minHeight: '90vh'}}>
           {Tags.map((val, index, arr) => {
             return (
               <div 
@@ -720,7 +753,7 @@ function App() {
             )
           })}
         </Content>
-        <Sider style = {{background: '#49C7CD', minHeight: '90vh'}} collapsible></Sider>
+        <Sider style = {{background: '#49C7CD', minHeight: '90vh'}} ></Sider>
       </Layout>
     </Layout>
     </>
